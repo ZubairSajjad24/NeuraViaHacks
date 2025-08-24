@@ -1,10 +1,19 @@
 import re
 import random
-# Correct way to load flan-t5 (it's not a causal LM)
-from transformers import T5Tokenizer, T5ForConditionalGeneration
+
+# Hugging Face / LangChain
+from transformers import T5Tokenizer, T5ForConditionalGeneration, pipeline
+from langchain_community.document_loaders import TextLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain.chains import RetrievalQA
+from langchain import HuggingFacePipeline
 
 
-# Simple rule-based responses
+# ---------------------------
+# Rule-based responses
+# ---------------------------
 RESPONSE_RULES = {
     r"symptom|sign|feel": [
         "Common early symptoms include tremors, stiffness, and balance issues.",
@@ -34,34 +43,37 @@ DEFAULT_RESPONSES = [
     "I can provide general information, but please consult a doctor for medical advice."
 ]
 
+
 def get_response(query, risk_score=None):
     """Get a response based on the query using rule-based matching"""
     query = query.lower()
     
-    # Check if any pattern matches the query
+    # Check if any regex pattern matches the query
     for pattern, responses in RESPONSE_RULES.items():
         if re.search(pattern, query):
             return random.choice(responses)
     
-    # Return a default response if no pattern matches
+    # Return a default response if nothing matched
     return random.choice(DEFAULT_RESPONSES)
 
 
-
+# ---------------------------
+# Setup RAG system
+# ---------------------------
 def setup_rag():
     try:
-        # Load documents
+        # Load documents from your knowledge base
         loader = TextLoader("data/knowledge_base/medical_guidelines.txt")
         documents = loader.load()
         
-        # Split documents into chunks
+        # Split into chunks
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=1000,
             chunk_overlap=200
         )
         texts = text_splitter.split_documents(documents)
         
-        # Create embeddings using a local model
+        # Build vectorstore with embeddings
         embeddings = HuggingFaceEmbeddings(
             model_name="sentence-transformers/all-MiniLM-L6-v2"
         )
@@ -70,7 +82,7 @@ def setup_rag():
         # Create retriever
         retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
         
-        # Use T5 model correctly
+        # Use Flan-T5 correctly
         model_name = "google/flan-t5-small"
         tokenizer = T5Tokenizer.from_pretrained(model_name)
         model = T5ForConditionalGeneration.from_pretrained(model_name)
@@ -91,6 +103,7 @@ def setup_rag():
             return_source_documents=False
         )
         return qa_chain
+    
     except Exception as e:
         print(f"Error setting up RAG: {e}")
         return None

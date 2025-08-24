@@ -213,46 +213,28 @@ def show_connect():
     
     st.session_state.report_generated = True
     st.success("Report generated successfully!")
-
 def show_personalize():
     st.header("Personalized Care Plan")
-    
+
     if not st.session_state.report_generated:
         st.warning("Please generate a report in the Connect section first.")
         return
-    
+
     st.subheader("Care Plan Assistant")
     st.info("Ask questions about your results or get personalized recommendations for improving your neurological health.")
-    
+
     # Initialize chat history
     if "messages" not in st.session_state:
         st.session_state.messages = []
-    
+
     # Display chat messages from history
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
-    
-    # React to user input
-    if prompt := st.chat_input("Ask a question about your care plan..."):
-        # Display user message in chat message container
-        with st.chat_message("user"):
-            st.markdown(prompt)
-        # Add user message to chat history
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        
-        # Get response from RAG system
-        with st.chat_message("assistant"):
-            with st.spinner("Thinking..."):
-                response = get_response(prompt, st.session_state.risk_score)
-                st.markdown(response)
-        
-        # Add assistant response to chat history
-        st.session_state.messages.append({"role": "assistant", "content": response})
-    
-    # Suggested questions
-    st.subheader("Suggested Questions")
-    cols = st.columns(3)
+
+    st.divider()
+    st.subheader("💡 Suggested Questions")
+
     questions = [
         "What lifestyle changes can I make to improve my neurological health?",
         "How accurate is this assessment?",
@@ -261,12 +243,41 @@ def show_personalize():
         "What exercises can help with coordination?",
         "How often should I monitor my symptoms?"
     ]
-    
-    for i, col in enumerate(cols):
-        if i < len(questions):
-            with col:
-                if st.button(questions[i], key=f"q_{i}"):
-                    st.chat_input("Ask a question about your care plan...", value=questions[i])
+
+    # Suggested question buttons
+    cols = st.columns(2)  # two buttons per row
+    for i, question in enumerate(questions):
+        with cols[i % 2]:
+            if st.button(question, key=f"q_{i}"):
+                handle_user_query(question)
+
+    st.divider()
+
+    # Normal chat input
+    if prompt := st.chat_input("Ask a question about your care plan..."):
+        handle_user_query(prompt)
+
+    # Clear chat option
+    if st.button("🗑️ Clear Chat"):
+        st.session_state.messages = []
+        st.rerun()
+
+
+def handle_user_query(query: str):
+    """Helper to handle both button questions and chat input uniformly"""
+    # Show user message
+    with st.chat_message("user"):
+        st.markdown(query)
+    st.session_state.messages.append({"role": "user", "content": query})
+
+    # Get assistant response
+    with st.chat_message("assistant"):
+        with st.spinner("Thinking..."):
+            response = get_response(query, st.session_state.risk_score)
+            st.markdown(response)
+    st.session_state.messages.append({"role": "assistant", "content": response})
+
+
 
 def show_about():
     st.header("About NeuroBridge")
