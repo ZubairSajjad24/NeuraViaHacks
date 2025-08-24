@@ -1,0 +1,23 @@
+# Parkinson's Disease Knowledge Base
+
+## Symptoms
+Tremors: Often begin in a hand, finger, or foot while at rest.
+Rigidity: Muscle stiffness that can occur in any part of the body.
+Bradykinesia: Slowness of movement that makes simple tasks difficult.
+Postural instability: Impaired balance and coordination leading to falls.
+
+## Treatment Options
+Medications: Levodopa, dopamine agonists, MAO-B inhibitors.
+Therapies: Physical therapy, occupational therapy, speech therapy.
+Surgical: Deep brain stimulation in advanced cases.
+
+## Lifestyle Recommendations
+Exercise: Regular aerobic exercise and strength training.
+Diet: High-fiber foods, plenty of fluids, balanced nutrition.
+Sleep: Maintain regular sleep patterns and address sleep issues.
+
+## When to See a Doctor
+Consult a healthcare provider if you experience any symptoms like tremors, stiffness, or balance problems that interfere with daily activities.
+
+## Disclaimer
+This information is for educational purposes only. Always consult with healthcare professionals for medical advice.
