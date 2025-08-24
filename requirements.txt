@@ -11,3 +11,4 @@ faiss-cpu==1.7.4
 transformers==4.30.2
 torch==2.0.1
 faiss-cpu==1.7.4
+joblib
